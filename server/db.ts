@@ -1,7 +1,9 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, projects, lyrics, processingJobs, InsertProject, InsertLyric, InsertProcessingJob } from "../drizzle/schema";
 import { ENV } from './_core/env';
+
+import type { Project, Lyric, ProcessingJob } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -89,4 +91,86 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+/**
+ * Project queries
+ */
+export async function getUserProjects(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(projects).where(eq(projects.userId, userId));
+}
+
+export async function getProjectById(projectId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createProject(data: InsertProject) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(projects).values(data);
+  return result;
+}
+
+export async function updateProject(projectId: number, data: Partial<InsertProject>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(projects).set(data).where(eq(projects.id, projectId));
+}
+
+/**
+ * Lyrics queries
+ */
+export async function getLyricsByProjectId(projectId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(lyrics).where(eq(lyrics.projectId, projectId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createLyrics(data: InsertLyric) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(lyrics).values(data);
+}
+
+export async function updateLyrics(lyricsId: number, data: Partial<InsertLyric>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(lyrics).set(data).where(eq(lyrics.id, lyricsId));
+}
+
+/**
+ * Processing jobs queries
+ */
+export async function createProcessingJob(data: InsertProcessingJob) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(processingJobs).values(data);
+}
+
+export async function getProcessingJobsByProjectId(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(processingJobs).where(eq(processingJobs.projectId, projectId));
+}
+
+export async function updateProcessingJob(jobId: number, data: Partial<InsertProcessingJob>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(processingJobs).set(data).where(eq(processingJobs.id, jobId));
+}
+
+export async function getPendingJobs() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(processingJobs).where(eq(processingJobs.status, "pending")).limit(10);
+}
+
+export async function deleteLyrics(lyricsId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(lyrics).where(eq(lyrics.id, lyricsId));
+}
