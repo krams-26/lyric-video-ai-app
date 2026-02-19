@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -24,9 +24,12 @@ export default function Upload() {
 
   const createProject = trpc.projects.create.useMutation();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
+  const handleFileSelect = useCallback((selectedFile: File | null) => {
+    if (!selectedFile) {
+      setFile(null);
+      setError('');
+      return;
+    }
 
     // Validate file type
     const validTypes = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/x-m4a'];
@@ -45,7 +48,7 @@ export default function Upload() {
 
     setError('');
     setFile(selectedFile);
-  };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +111,7 @@ export default function Upload() {
             {/* File Upload */}
             <div className="space-y-3">
               <Label className="text-white">Fichier Audio</Label>
-              <AudioUploader onFileSelect={setFile} selectedFile={file} isLoading={isLoading} />
+              <AudioUploader onFileSelect={handleFileSelect} selectedFile={file} isLoading={isLoading} />
             </div>
 
             {/* Project Title */}

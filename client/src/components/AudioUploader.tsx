@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { UploadCloud, X } from 'lucide-react';
 
 interface AudioUploaderProps {
-  onFileSelect: (file: File) => void;
+  onFileSelect: (file: File | null) => void;
   selectedFile: File | null;
   isLoading?: boolean;
 }
@@ -44,7 +44,7 @@ export default function AudioUploader({ onFileSelect, selectedFile, isLoading }:
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    onFileSelect(null as any);
+    onFileSelect(null);
   };
 
   return (
