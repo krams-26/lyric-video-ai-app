@@ -51,15 +51,19 @@ export const projectsRouter = router({
         status: 'processing',
       });
 
+      // Get the actual project ID
+      const projectId = (project as any).id;
+      if (!projectId) throw new Error('Failed to create project');
+
       // Queue the style transfer job
       await queueJob({
-        projectId: 1, // TODO: Get actual project ID from insert result
+        projectId,
         jobType: 'style_transfer',
       });
 
       // Queue the transcription job
       await queueJob({
-        projectId: 1,
+        projectId,
         jobType: 'transcription',
       });
 
@@ -147,7 +151,13 @@ export const projectsRouter = router({
           isEdited: 1,
         });
       } else {
-        // TODO: Update existing lyrics
+        // Update existing lyrics
+        const { updateLyrics: updateLyricsDb } = await import('../db');
+        await updateLyricsDb(lyrics.id, {
+          content: input.content,
+          lyricsJson: JSON.stringify(input.lyricsJson),
+          isEdited: 1,
+        });
       }
 
       return getLyricsByProjectId(input.projectId);

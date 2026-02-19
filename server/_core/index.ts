@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { startJobWorker } from "../services/jobWorker";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -59,6 +60,10 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    // Start job worker in development mode
+    if (process.env.NODE_ENV === "development") {
+      startJobWorker(3000); // Process jobs every 3 seconds in dev
+    }
   });
 }
 

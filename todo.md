@@ -24,12 +24,17 @@
 - [x] Tests unitaires pour formatLyricsText
 - [x] Tous les tests passent (5/5)
 
+## Corrections de Bugs (Phase 2)
+- [x] Récupération correcte de l'ID de projet après insertion
+- [x] Utilisation du bon ID de projet pour les jobs en file d'attente
+- [x] Démarrage du worker de traitement des jobs en arrière-plan
+- [x] Implémentation complète de la mise à jour des paroles
+
 ## À Faire (Phase Finale)
 - [ ] Intégration S3 pour l'upload de fichiers audio
 - [ ] Intégration API Wondera réelle (actuellement simulée)
 - [ ] Intégration API Whisper réelle (actuellement simulée)
 - [ ] Moteur de rendu vidéo réel (FFmpeg ou Remotion)
-- [ ] Système de file d'attente en arrière-plan (worker)
 - [ ] Gestion des erreurs et retry logic
 - [ ] Optimisation des performances
 - [ ] Documentation API

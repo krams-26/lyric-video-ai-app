@@ -111,7 +111,9 @@ export async function createProject(data: InsertProject) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const result = await db.insert(projects).values(data);
-  return result;
+  // Return the inserted project with ID
+  const insertedProject = await db.select().from(projects).where(eq(projects.userId, data.userId)).orderBy((t) => t.id).limit(1);
+  return insertedProject[0] || result;
 }
 
 export async function updateProject(projectId: number, data: Partial<InsertProject>) {
@@ -139,7 +141,8 @@ export async function createLyrics(data: InsertLyric) {
 export async function updateLyrics(lyricsId: number, data: Partial<InsertLyric>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return db.update(lyrics).set(data).where(eq(lyrics.id, lyricsId));
+  await db.update(lyrics).set(data).where(eq(lyrics.id, lyricsId));
+  return db.select().from(lyrics).where(eq(lyrics.id, lyricsId)).limit(1).then(r => r[0]);
 }
 
 /**
